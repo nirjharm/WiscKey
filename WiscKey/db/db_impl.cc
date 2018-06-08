@@ -1120,11 +1120,11 @@ Status DBImpl::Get(const ReadOptions& options,
   }
 
   MemTable* mem = mem_;
-  MemTable* imm = imm_;
-  Version* current = versions_->current();
+  //MemTable* imm = imm_;
+  //Version* current = versions_->current();
   mem->Ref();
-  if (imm != NULL) imm->Ref();
-  current->Ref();
+  //if (imm != NULL) imm->Ref();
+  //current->Ref();
 
   bool have_stat_update = false;
   Version::GetStats stats;
@@ -1136,21 +1136,24 @@ Status DBImpl::Get(const ReadOptions& options,
     LookupKey lkey(key, snapshot);
     if (mem->Get(lkey, value, &s)) {
       // Done
-    }// else if (imm != NULL && imm->Get(lkey, value, &s)) {
+    }
+    
+	/* else if (imm != NULL && imm->Get(lkey, value, &s)) {
       // Done
-    //} else {
+    }*/ else {
       //s = current->Get(options, lkey, value, &stats);
-      //have_stat_update = true;
-   // }
+     	s = Status::NotFound(Slice());
+	have_stat_update = true;
+    }
     mutex_.Lock();
   }
 
-  if (have_stat_update && current->UpdateStats(stats)) {
+  //if (have_stat_update && current->UpdateStats(stats)) {
     //MaybeScheduleCompaction();
-  }
+  //}
   mem->Unref();
-  if (imm != NULL) imm->Unref();
-  current->Unref();
+  //if (imm != NULL) imm->Unref();
+  //current->Unref();
   return s;
 }
 

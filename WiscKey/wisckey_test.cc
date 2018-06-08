@@ -120,8 +120,8 @@ static void testing_function(WK * wk, string &key, string &value)
 	
 /* Read after Delete */
 	cout << "\n\n\t\tInput Received\n" << endl;
-        string testkey= "1001224314";
-        string testvalue = "Abhishek Sharma";
+        string testkey = "asdf";
+        string testvalue = "Nirjhar";
         cout << "Key: " << testkey << endl;
         cout << "Value: " << testvalue << endl;
 	const bool testfound = wisckey_get(wk,testkey,testvalue);
@@ -168,7 +168,14 @@ int main(int argc, char ** argv)
 
   	clock_t dt = clock() - t0;
   	cout << "time elapsed: " << dt * 1.0e-6 << " seconds" << endl;
-        close_wisckey(wk);
+        
+       
+	string key="asdf";
+	value="Nirjhar";
+    	testing_function(wk, key,value);	
+  
+
+	close_wisckey(wk);
         destroy_leveldb("wisckey_test_dir");       
         remove("logfile");
         exit(0);
