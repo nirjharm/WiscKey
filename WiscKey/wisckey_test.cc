@@ -153,6 +153,7 @@ int main(int argc, char ** argv)
     		vbuf[i] = rand();
   	}
   	string value = string(vbuf, value_size);
+	cout << value.length() << "%%%%%%%%%%%%%%%%%%%%%%";
  	size_t nfill = 1000000000 / (value_size + 8);
   	clock_t t0 = clock();
   	size_t p1 = nfill / 40;
@@ -160,6 +161,9 @@ int main(int argc, char ** argv)
     		string key = std::to_string(((size_t)rand())*((size_t)rand()));
     		wisckey_set(wk, key, value);	
    		if (j >= p1) {
+			//fflush(wk->logfile);
+			//fsync(fileno(wk->logfile));
+			//system("sync");
       			clock_t dt = clock() - t0;
       			cout << "progress: " << j+1 << "/" << nfill << " time elapsed: " << dt * 1.0e-6 << endl << std::flush;
       			p1 += (nfill / 40);
