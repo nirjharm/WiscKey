@@ -42,12 +42,13 @@ static bool wisckey_get(WK * wk, string &key, string &value)
 	}
 	value_length = s;
 
+	  	std::string::size_type sz;
+  	long offset = std::stol (value_offset,&sz);
+	long length = std::stol (value_length,&sz);
+
 	cout << "Value Offset: " << value_offset << endl;
 	cout << "Value Length: " << value_length << endl;
 
-  	std::string::size_type sz;
-  	long offset = std::stol (value_offset,&sz);
-	long length = std::stol (value_length,&sz);
 
 	//cout << offset << length << endl;
 	std::string value_record;
@@ -103,15 +104,18 @@ static void close_wisckey(WK * wk)
 static void testing_function(WK * wk, string &key, string &value) 
 {
 /* Setting Value and Testing it */
-        
+  //      int i;
 	cout << "\n\n\t\tInput Received\n" << endl;
 	cout << "Key: " << key << endl;
         cout << "Value: " << value << endl;
 	wisckey_set(wk,key,value);
+//	cin >> i;
 	const bool found = wisckey_get(wk,key,value);
 	if (found) {
 		cout << "Record Matched" << endl;
 	}
+	//int i;
+//	cin >> i;
 
 /* Deleting Value */
 	cout << "\n\n\t\tDelete Operation\n" << endl;
@@ -158,17 +162,21 @@ int main(int argc, char ** argv)
   	size_t p1 = nfill / 40;
   	for (size_t j = 0; j < nfill; j++) {
     		string key = std::to_string(((size_t)rand())*((size_t)rand()));
-    		wisckey_set(wk, key, value);	
-   		if (j >= p1) {
+   		wisckey_set(wk,key,value);
+		if (j >= p1) {
       			clock_t dt = clock() - t0;
       			cout << "progress: " << j+1 << "/" << nfill << " time elapsed: " << dt * 1.0e-6 << endl << std::flush;
       			p1 += (nfill / 40);
     		}    
   	}
-
-  	clock_t dt = clock() - t0;
+	clock_t dt = clock() - t0;
   	cout << "time elapsed: " << dt * 1.0e-6 << " seconds" << endl;
-        close_wisckey(wk);
+        
+	string key="asdf";
+	value="Nirjhar";
+    	testing_function(wk, key,value);	
+  	
+	close_wisckey(wk);
         destroy_leveldb("wisckey_test_dir");       
         remove("logfile");
         exit(0);
