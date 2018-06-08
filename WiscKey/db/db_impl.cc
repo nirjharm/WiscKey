@@ -685,7 +685,7 @@ void DBImpl::BackgroundCall() {
 
 void DBImpl::BackgroundCompaction() {
   mutex_.AssertHeld();
-
+  printf("Compacting");
   if (imm_ != NULL) {
     CompactMemTable();
     return;
