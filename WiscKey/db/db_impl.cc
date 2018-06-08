@@ -607,7 +607,7 @@ void DBImpl::TEST_CompactRange(int level, const Slice* begin,const Slice* end) {
   while (!manual.done && !shutting_down_.Acquire_Load() && bg_error_.ok()) {
     if (manual_compaction_ == NULL) {  // Idle
       manual_compaction_ = &manual;
-      MaybeScheduleCompaction();
+      //MaybeScheduleCompaction();
     } else {  // Running either my compaction or another compaction.
       bg_cv_.Wait();
     }
@@ -679,13 +679,13 @@ void DBImpl::BackgroundCall() {
 
   // Previous compaction may have produced too many files in a level,
   // so reschedule another compaction if needed.
-  MaybeScheduleCompaction();
+  //MaybeScheduleCompaction();
   bg_cv_.SignalAll();
 }
 
 void DBImpl::BackgroundCompaction() {
   mutex_.AssertHeld();
-
+  printf("Compacting");
   if (imm_ != NULL) {
     CompactMemTable();
     return;
@@ -1135,17 +1135,17 @@ Status DBImpl::Get(const ReadOptions& options,
     LookupKey lkey(key, snapshot);
     if (mem->Get(lkey, value, &s)) {
       // Done
-    } else if (imm != NULL && imm->Get(lkey, value, &s)) {
+    }// else if (imm != NULL && imm->Get(lkey, value, &s)) {
       // Done
-    } else {
-      s = current->Get(options, lkey, value, &stats);
-      have_stat_update = true;
-    }
+    //} else {
+      //s = current->Get(options, lkey, value, &stats);
+      //have_stat_update = true;
+   // }
     mutex_.Lock();
   }
 
   if (have_stat_update && current->UpdateStats(stats)) {
-    MaybeScheduleCompaction();
+    //MaybeScheduleCompaction();
   }
   mem->Unref();
   if (imm != NULL) imm->Unref();
@@ -1168,7 +1168,7 @@ Iterator* DBImpl::NewIterator(const ReadOptions& options) {
 void DBImpl::RecordReadSample(Slice key) {
   MutexLock l(&mutex_);
   if (versions_->current()->RecordReadSample(key)) {
-    MaybeScheduleCompaction();
+    //MaybeScheduleCompaction();
   }
 }
 
@@ -1207,10 +1207,12 @@ Status DBImpl::Write(const WriteOptions& options, WriteBatch* my_batch) {
   }
 
   // May temporarily unlock and wait.
-  Status status = MakeRoomForWrite(my_batch == NULL);
+  //Status status = MakeRoomForWrite(my_batch == NULL);
+  Status status; //force status ok, avoid compactions
+	
   uint64_t last_sequence = versions_->LastSequence();
   Writer* last_writer = &w;
-  if (status.ok() && my_batch != NULL) {  // NULL batch is for compactions
+  if (status.ok()) {// && my_batch != NULL) {  // NULL batch is for compactions
     WriteBatch* updates = BuildBatchGroup(&last_writer);
     WriteBatchInternal::SetSequence(updates, last_sequence + 1);
     last_sequence += WriteBatchInternal::Count(updates);
@@ -1372,7 +1374,7 @@ Status DBImpl::MakeRoomForWrite(bool force) {
       mem_ = new MemTable(internal_comparator_);
       mem_->Ref();
       force = false;   // Do not force another compaction if have room
-      MaybeScheduleCompaction();
+      //MaybeScheduleCompaction();
     }
   }
   return s;
@@ -1519,7 +1521,7 @@ Status DB::Open(const Options& options, const std::string& dbname,
   }
   if (s.ok()) {
     impl->DeleteObsoleteFiles();
-    impl->MaybeScheduleCompaction();
+    //impl->MaybeScheduleCompaction();
   }
   impl->mutex_.Unlock();
   if (s.ok()) {
