@@ -643,7 +643,8 @@ void DBImpl::RecordBackgroundError(const Status& s) {
 }
 
 void DBImpl::MaybeScheduleCompaction() {
-  mutex_.AssertHeld();
+return;  
+mutex_.AssertHeld();
   if (bg_compaction_scheduled_) {
     // Already scheduled
   } else if (shutting_down_.Acquire_Load()) {
@@ -672,7 +673,7 @@ void DBImpl::BackgroundCall() {
   } else if (!bg_error_.ok()) {
     // No more background work after a background error.
   } else {
-    BackgroundCompaction();
+    //BackgroundCompaction();
   }
 
   bg_compaction_scheduled_ = false;
